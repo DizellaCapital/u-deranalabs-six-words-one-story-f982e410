@@ -36,7 +36,13 @@ def main() -> None:
     text = validate(LINE)
     out = Path("/output")
     out.mkdir(parents=True, exist_ok=True)
-    (out / "entry.txt").write_text(text + "\n", encoding="utf-8")
+    target = out / "entry.txt"
+    target.write_text(text + "\n", encoding="utf-8")
+    # Read back and re-validate: the file the judge reads must be the
+    # exact six-word line, not just what we intended to write.
+    stored = target.read_text(encoding="utf-8").rstrip("\n")
+    if validate(stored) != text:
+        raise ValueError("stored entry does not match the validated line")
 
 
 if __name__ == "__main__":
